@@ -477,6 +477,12 @@ module RSpec::Puppet
     end
 
     def stub_facts!(facts)
+      if defined? Facter::Resolvers::BaseResolver
+        Facter::Resolvers::BaseResolver.class_eval do
+          def self.resolve(_fact_name, _options = {}); end
+        end
+      end
+
       Puppet.settings[:autosign] = false if Puppet.settings.include? :autosign
       Facter.clear
       facts.each { |k, v| Facter.add(k, :weight => 999) { setcode { v } } }
